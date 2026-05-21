@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robiul Islam | Motion & Visual Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div id="preloader" class="preloader">
+        <div class="preloader-logo">ROBIUL<span class="cyan-dot">.</span>VISUALS</div>
+        <div class="loading-bar"><div class="progress"></div></div>
+    </div>
+
+    <div class="cursor-glow"></div>
+
+    <nav class="studio-nav">
+        <div class="nav-container">
+            <a href="#" class="brand-logo">ROBIUL<span class="cyan-dot">.</span>VISUALS</a>
+            <div class="nav-links">
+                <a href="#work">Work</a>
+                <a href="projects.html">All Work</a>
+                <a href="#support" class="btn-nav-ticket">Open Ticket</a>
+
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero-section">
+        <div class="hero-container">
+            <div class="hero-text">
+                <span class="tagline">MOTION & VIDEO STUDIO</span>
+                <h1>BRINGING VISUALS TO LIFE THROUGH <span class="text-glow">MOTION</span></h1>
+                <p>High-end cinematic editing, motion graphics, and technical brand infrastructure crafted for modern digital platforms.</p>
+                <div class="hero-cta">
+                    <a href="https://www.fiverr.com" target="_blank" class="btn-primary">Hire on Fiverr</a>
+                    <a href="#work" class="btn-secondary">View Reels</a>
+                </div>
+            </div>
+            
+         <div class="hero-reel-wrapper">
+            <div class="video-window">
+                <div class="window-header">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="window-title">showreel.mp4</span>
+        </div>
+                <video autoplay loop muted playsinline disablePictureInPicture class="hero-video">
+                <source src="assets/videos/showreel.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+        </div>
+
+    </header>
+
+    <section class="work-section" id="work">
+  <div class="section-header">
+    <h2>Selected Motion Visuals</h2>
+    <div class="accent-line"></div>
+  </div>
+
+  <div class="work-list" id="dynamic-projects-container">
+    <div style="text-align: center; color: var(--text-muted); padding: 2rem;">
+      Loading cinematic database files...
+    </div>
+  </div>
+</section>
+
+   <div style="text-align: center; margin: 5rem auto 2rem auto; width: 100%;">
+  <a href="projects.html" class="btn-archive-view">
+    View Full Showroom Archive &rarr;
+  </a>
+</div>
+
+    <section id="support" class="support-section">
+        <div class="support-container">
+            <div class="support-info">
+                <h2>LET'S SECURE YOUR NEXT PROJECT</h2>
+                <p>Have a complex problem, need technical assistance, or checking status? Log an encrypted agency support ticket instantly.</p>
+                <div class="direct-channels">
+                    <p>Direct Channel: <a href="mailto:pixelrobiul@gmail.com">pixelrobiul@gmail.com</a></p>
+                </div>
+            </div>
+
+            <div class="ticket-box">
+                <form id="supportTicketForm" class="ticket-form">
+                    <div class="form-group">
+                        <label for="clientName">Your Name</label>
+                        <input type="text" id="clientName" required placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label for="clientEmail">Your Email</label>
+                        <input type="email" id="clientEmail" required placeholder="john@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="ticketSubject">Topic</label>
+                        <input type="text" id="ticketSubject" required placeholder="Video Project Inquiry">
+                    </div>
+                    <div class="form-group">
+                        <label for="ticketMessage">Detailed Brief / Issue</label>
+                        <textarea id="ticketMessage" rows="5" required placeholder="Describe your project requirements or issue in detail..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit-ticket">Launch Support Ticket</button>
+                </form>
+                <div id="formResponse" class="form-status-msg hidden"></div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="studio-footer">
+        <p>&copy; 2026 ROBIUL ISLAM. All rights secured.</p>
+    </footer>
+    <script src="js/support.js"></script>
+    <script src="js/main.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAR7BTzvAftYn4QYLXxL5N8wKm5Fz7zw9I", // Keep your real API key string here
+      authDomain: "its-robiul-project.firebaseapp.com",
+      projectId: "its-robiul-project",
+      storageBucket: "its-robiul-project.firebasestorage.app",
+      messagingSenderId: "67384048870",
+      appId: "1:673848048870:web:8e6acaf6d156a4e0cecf27", // Keep your real App ID string here
+      measurementId: "G-Y5H33T4T0H" // Keep your real Measurement ID string here
+    };
+
+    // Start the Firebase stream engine
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore(); // This opens up the database connection
+
+    // Target the newly added HTML container
+    const projectsContainer = document.getElementById('dynamic-projects-container');
+
+    // 1. Pull the live collection documents from Cloud Firestore
+    db.collection("projects")
+    .orderBy("createdAt", "desc")
+    .limit(3)
+    .get()
+    .then((querySnapshot) => {
+      
+      // Clear out the "Loading..." placeholder text
+      projectsContainer.innerHTML = "";
+      
+      let cardMarkup = "";
+
+      // 2. Loop through every project document found in your database
+      querySnapshot.forEach((doc) => {
+        const project = doc.data();
+        const docId = doc.id; // Grabs your document ID string (e.g., 'porsche-cinematic')
+
+        // 3. Assemble the HTML string using your exact alternating flex box design layout rules
+        cardMarkup += `
+          <div class="project-card">
+            <div class="project-thumb">
+              <img src="${project.thumbnail}" alt="${project.title}">
+            </div>
+            <div class="project-info">
+              <h3>${project.title}</h3>
+              <p>${project.description}</p>
+              <a href="case-study.html?id=${docId}" class="view-link">
+                Watch Reel &rarr;
+              </a>
+            </div>
+          </div>
+        `;
+      });
+
+      // 4. Inject the compiled database elements directly into your UI canvas
+      projectsContainer.innerHTML = cardMarkup;
+
+    }).catch((error) => {
+      console.error("Error fetching portfolio projects from database:", error);
+      projectsContainer.innerHTML = `<p style="color: red; text-align: center;">Failed to sync with cloud files.</p>`;
+    });
+    
+    console.log("Firebase Database successfully connected!", db);
+  </script>
+
+</body>
+</html>

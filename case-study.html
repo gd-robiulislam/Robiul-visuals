@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Production Case Study | Robiul Visuals</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <nav class="studio-nav">
+    <div class="nav-container">
+      <a href="index.html" class="brand-logo">ROBIUL VISUALS<span style="color:#00ffff;">.</span></a>
+      <div class="nav-links">
+        <a href="index.html#work">Work</a>
+        <a href="index.html#contact" class="btn-nav-ticket">Open Ticket</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="hero-section" id="case-study-viewport" style="min-height: 100vh; display: flex; align-items: center; background: #060a13; padding-top: 80px;">
+    <div style="text-align: center; width: 100%; color: rgba(255,255,255,0.4); font-family: sans-serif;">
+      Loading cinematic production metadata files...
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Paste your exact keys here just like at the bottom of index.html
+    const firebaseConfig = {
+      apiKey: "AIzaSyAR7BTzvAftYn4QYLXxL5N8wKm5Fz7zw9I", // Put your actual API key here
+      authDomain: "its-robiul-project.firebaseapp.com",
+      projectId: "its-robiul-project",
+      storageBucket: "its-robiul-project.firebasestorage.app",
+      messagingSenderId: "67384048870",
+      appId: "1:673848048870:web:8e6acaf6d156a4e0cecf27" // Put your actual App ID here
+    };
+
+    // Start the Firebase stream engine
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+
+  <script>
+    // Identify which project record to look up based on the current active URL link address parameter
+    const queryParameters = new URLSearchParams(window.location.search);
+    const activeDocId = queryParameters.get('id');
+    const viewportContainer = document.getElementById('case-study-viewport');
+
+    if (activeDocId) {
+      // Fetch the corresponding custom metadata node document tracking row inside Firestore
+      db.collection("projects").doc(activeDocId).get().then((doc) => {
+        if (doc.exists) {
+          const projectDetails = doc.data();
+
+          // Inject the data properties directly inside your premium responsive layout windows
+          viewportContainer.innerHTML = `
+            <div class="hero-container" style="display: flex; gap: 4rem; max-width: 1200px; margin: 0 auto; padding: 2rem; width: 100%; flex-wrap: wrap;">
+              
+              <div class="hero-text" style="flex: 1; min-width: 300px; display: flex; flex-direction: column; justify-content: center;">
+                <span class="tagline" style="color: #00ffff; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; font-size: 0.9rem; margin-bottom: 1rem; display: block;">${projectDetails.category}</span>
+                <h1 style="font-size: 3rem; color: #fff; margin-bottom: 1.5rem; font-weight: 800; text-transform: uppercase; line-height: 1.1;">${projectDetails.title}</h1>
+                <p style="color: rgba(255,255,255,0.7); font-size: 1.1rem; line-height: 1.6; margin-bottom: 2.5rem;">${projectDetails.description}</p>
+                <div class="hero-cta">
+                  <a href="index.html" class="btn-secondary" style="text-decoration: none; padding: 0.8rem 2rem; border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 4px; font-weight: 600; display: inline-block;">&larr; Back to Showroom</a>
+                </div>
+              </div>
+
+              <div class="hero-reel-wrapper" style="flex: 1.3; min-width: 320px;">
+                <div class="video-window" style="background: #0d1527; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05);">
+                  <div class="window-header" style="background: #090e1a; padding: 0.8rem 1rem; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <div class="dot" style="width: 10px; height: 10px; border-radius: 50%; background: #ff5f56;"></div>
+                    <div class="dot" style="width: 10px; height: 10px; border-radius: 50%; background: #ffbd2e;"></div>
+                    <div class="dot" style="width: 10px; height: 10px; border-radius: 50%; background: #27c93f;"></div>
+                    <span class="window-title" style="color: rgba(255,255,255,0.4); font-size: 0.8rem; font-family: monospace; margin-left: 0.5rem;">render_engine.mp4</span>
+                  </div>
+                  <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+                  <video class="hero-video" 
+                      controls 
+                      autoplay 
+                      muted 
+                      playsinline
+                      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; background: #000; object-fit: cover;">
+                      <source src="${projectDetails.videoUrl}" type="video/mp4">
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          `;
+        } else {
+          viewportContainer.innerHTML = `<div style="text-align:center; width:100%; color:#fff;"><h1>Project Not Found</h1></div>`;
+        }
+      }).catch((err) => {
+        console.error("Critical execution breakdown parsing system files:", err);
+      });
+    } else {
+      viewportContainer.innerHTML = `<div style="text-align:center; width:100%; color:#fff;"><h1>No Project Specified in URL</h1></div>`;
+    }
+  </script>
+</body>
+</html>

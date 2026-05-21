@@ -1,0 +1,976 @@
+/* ==========================================================================
+   1. DESIGN SYSTEM & CORE VARIABLES
+   ========================================================================== */
+:root {
+  /* Colors */
+  --bg-deep: #060a13;         /* Darkest navy background */
+  --bg-surface: #0b101d;      /* Slightly lighter surface navy for cards */
+  --bg-input: #121826;        /* Clean, solid contrast for input fields */
+  --accent-cyan: #00f0ff;     /* Vibrant electric cyan/aqua */
+  --accent-cyan-glow: rgba(0, 240, 255, 0.25);
+  
+  /* Text Spectrum */
+  --text-pure: #ffffff;       /* Headers and primary links */
+  --text-body: #a2b4dc;       /* Main scannable body paragraphs */
+  --text-muted: #5e6f8e;      /* Labels and placeholder copy */
+
+  /* Typography */
+  --font-studio: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  
+  /* Layout Properties */
+  --max-width: 1200px;
+  --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --border-radius: 8px;
+}
+
+/* ==========================================================================
+   2. GLOBAL RESET & BASE STYLES
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  background-color: var(--bg-deep);
+}
+
+body {
+  font-family: var(--font-studio);
+  color: var(--text-body);
+  line-height: 1.6;
+  overflow-x: hidden;
+  background: radial-gradient(circle at 80% 20%, #0d172e 0%, var(--bg-deep) 60%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+img, video {
+  max-width: 100%;
+  display: block;
+}
+
+/* Common Layout Container */
+.nav-container, .hero-container, .work-grid, .support-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* ==========================================================================
+   3. MINIMALIST UTILITY NAVIGATION
+   ========================================================================== */
+.studio-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  background: rgba(6, 10, 19, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.nav-container {
+  height: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand-logo {
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  color: var(--text-pure);
+}
+
+.cyan-dot {
+  color: var(--accent-cyan);
+  text-shadow: 0 0 8px var(--accent-cyan);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.nav-links a:not(.btn-nav-ticket) {
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  font-weight: 500;
+  color: var(--text-body);
+}
+
+.nav-links a:hover:not(.btn-nav-ticket) {
+  color: var(--accent-cyan);
+}
+
+/* Navigation Ticket Button */
+.btn-nav-ticket {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--accent-cyan);
+  color: var(--accent-cyan);
+  background: transparent;
+}
+
+.btn-nav-ticket:hover {
+  background: var(--accent-cyan-glow);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+}
+
+/* ==========================================================================
+   4. CINEMATIC HERO SECTION
+   ========================================================================== */
+.hero-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding-top: 100px; /* Offset for fixed nav */
+}
+
+.hero-container {
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+  width: 100%;
+}
+
+.hero-text {
+  flex: 1.2;
+}
+
+.tagline {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  color: var(--accent-cyan);
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.hero-text h1 {
+  font-size: 3.2rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--text-pure);
+  margin-bottom: 1.5rem;
+  letter-spacing: -1px;
+}
+
+.text-glow {
+  color: var(--accent-cyan);
+  position: relative;
+}
+
+.hero-text p {
+  font-size: 1.05rem;
+  color: var(--text-body);
+  max-width: 520px;
+  margin-bottom: 2.5rem;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 1.5rem;
+}
+
+/* CTA Buttons */
+.btn-primary {
+  background: var(--text-pure);
+  color: var(--bg-deep);
+  padding: 0.9rem 2rem;
+  font-weight: 600;
+  border-radius: var(--border-radius);
+}
+
+.btn-primary:hover {
+  background: var(--accent-cyan);
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-pure);
+  padding: 0.9rem 2rem;
+  font-weight: 600;
+  border-radius: var(--border-radius);
+}
+
+.btn-secondary:hover {
+  border-color: var(--text-pure);
+  transform: translateY(-2px);
+}
+
+/* Cinematic Video Window Container */
+.hero-reel-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.video-window {
+  width: 100%;
+  background: var(--bg-surface);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 240, 255, 0.05);
+}
+
+.window-header {
+  background: #0d1220;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.window-header .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.window-title {
+  font-size: 0.75rem;
+  font-family: monospace;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.hero-video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+/* ==========================================================================
+   5. WORK REEL SHOWCASE GRID
+   ========================================================================== */
+.work-section {
+  padding: 8rem 0;
+  background: var(--bg-surface);
+  border-top: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.section-header {
+  max-width: var(--max-width);
+  margin: 0 auto 4rem auto;
+  padding: 0 2rem;
+}
+
+.section-header h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--text-pure);
+  margin-bottom: 0.5rem;
+}
+
+.accent-line {
+  width: 40px;
+  height: 3px;
+  background: var(--accent-cyan);
+}
+
+/* ==========================================================================
+   5. MINIMALIST ALTERNATING WORK LIST
+   ========================================================================== */
+.work-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8rem; /* Massive breathing room between projects */
+  padding: 4rem 0;
+  max-width: 1100px; /* Constrain the width so it doesn't stretch too far */
+  margin: 0 auto;
+}
+
+.project-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 5rem; /* Clean, reliable spacing instead of buggy overlap */
+}
+
+/* Alternate the layout cleanly */
+.project-card:nth-child(even) {
+  flex-direction: row-reverse;
+}
+
+/* The Image Container */
+.project-thumb {
+  width: 55%; /* Scaled down to leave room for text */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  border: none !important; /* 🔥 ERASED THE LIGHT BORDER LINE COMPLETELY */
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.project-thumb img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.7s ease;
+}
+
+/* Subtle image scale on hover */
+.project-card:hover .project-thumb img {
+  transform: scale(1.03);
+}
+
+/* The Text Container */
+.project-info {
+  width: 40%; /* Keeps text line-lengths readable */
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.project-info h3 {
+  font-size: 1.6rem; /* Scaled down for a premium, editorial feel */
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--text-pure);
+}
+
+.project-info p {
+  font-size: 0.95rem;
+  color: var(--text-body);
+  line-height: 1.7;
+}
+
+/* The Call to Action Link */
+.view-link {
+  margin-top: 0.5rem;
+  font-weight: 600;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition-smooth);
+}
+
+.view-link:hover {
+  gap: 15px; /* The arrow slides right when hovered */
+  text-shadow: 0 0 10px var(--accent-cyan-glow);
+}
+
+/* ==========================================================================
+   6. SUPPORT DESK & INTAKE CONSOLE
+   ========================================================================== */
+.support-section {
+  padding: 8rem 0;
+  background: var(--bg-deep);
+}
+
+.support-container {
+  display: flex;
+  gap: 5rem;
+  align-items: flex-start;
+}
+
+.support-info {
+  flex: 1;
+}
+
+.support-info h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--text-pure);
+  margin-bottom: 1.5rem;
+}
+
+.support-info p {
+  color: var(--text-body);
+  margin-bottom: 2rem;
+  max-width: 450px;
+}
+
+.direct-channels p {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.direct-channels a {
+  color: var(--text-pure);
+  font-weight: 600;
+  border-bottom: 1px solid var(--accent-cyan);
+}
+
+.direct-channels a:hover {
+  color: var(--accent-cyan);
+}
+
+/* Professional Support Form Box */
+.ticket-box {
+  flex: 1.2;
+  width: 100%;
+  background: var(--bg-surface);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 3rem;
+  border-radius: var(--border-radius);
+}
+
+.ticket-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text-pure);
+  text-transform: uppercase;
+}
+
+.form-group input, 
+.form-group textarea {
+  background: var(--bg-input);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text-pure);
+  padding: 1rem;
+  font-family: var(--font-studio);
+  font-size: 0.95rem;
+  border-radius: var(--border-radius);
+  transition: var(--transition-smooth);
+}
+
+.form-group input:focus, 
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+}
+
+.btn-submit-ticket {
+  background: var(--accent-cyan);
+  color: var(--bg-deep);
+  border: none;
+  padding: 1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  margin-top: 0.5rem;
+}
+
+.btn-submit-ticket:hover {
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Form Response Messages */
+.form-status-msg {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.form-status-msg.success {
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.form-status-msg.error {
+  background: rgba(255, 75, 75, 0.1);
+  border: 1px solid #ff4b4b;
+  color: #ff4b4b;
+}
+
+.hidden {
+  display: none;
+}
+
+/* ==========================================================================
+   7. MINIMALIST STUDIO FOOTER
+   ========================================================================== */
+.studio-footer {
+  padding: 3rem 0;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  background: var(--bg-deep);
+}
+
+.studio-footer p {
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   8. RESPONSIVE MEDIA QUERIES (TABLET & MOBILE)
+   ========================================================================== */
+@media (max-width: 992px) {
+  .hero-container, .support-container {
+    flex-direction: column;
+    gap: 3rem;
+  }
+  
+  .hero-text {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .hero-text p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .hero-cta {
+    justify-content: center;
+  }
+  
+  .work-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-text h1 {
+    font-size: 2.4rem;
+  }
+  
+  .ticket-box {
+    padding: 1.5rem;
+  }
+  
+  .nav-links {
+    gap: 1.2rem;
+  }
+}
+
+/* ==========================================================================
+   INTERACTIVE CURSOR GLOW
+   ========================================================================== */
+.cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.06) 0%, rgba(0, 0, 0, 0) 60%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none; /* Crucial: ensures the glow doesn't block you from clicking buttons */
+  z-index: 1; /* Sits behind the text, but above the background */
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+/* Ensure our main content sits above the glow */
+.nav-container, .hero-container, .work-grid, .support-container {
+  position: relative;
+  z-index: 10; 
+}
+
+/* ==========================================================================
+   ADVANCED: PRELOADER & 3D STYLES
+   ========================================================================== */
+.preloader {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-deep);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.9s cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+.preloader.slide-up {
+  transform: translateY(-100%);
+}
+
+.preloader-logo {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-pure);
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  animation: pulseLogo 1.5s infinite alternate;
+}
+
+.loading-bar {
+  width: 200px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.progress {
+  width: 0%;
+  height: 100%;
+  background: var(--accent-cyan);
+  animation: loadProgress 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes loadProgress { 
+  100% { width: 100%; } 
+}
+@keyframes pulseLogo { 
+  0% { opacity: 0.5; } 
+  100% { opacity: 1; text-shadow: 0 0 15px var(--accent-cyan-glow); } 
+}
+
+/* Ensure project cards can render 3D depth */
+.project-card {
+  perspective: 1000px;
+  will-change: transform;
+}
+
+/* ==========================================================================
+   THE THERMAL GLASS SYSTEM
+   ========================================================================== */
+
+/* 1. Frosted Glass (Cold / Low Priority / Older Work) */
+.frosted-glass {
+  background: rgba(11, 16, 29, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: var(--transition-smooth);
+}
+
+/* 2. Liquid Glass (Hot / High Priority / New Releases) */
+.liquid-glass {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(255, 255, 255, 0.02));
+  backdrop-filter: blur(8px); /* Less blur to look clear and fluid */
+  -webkit-backdrop-filter: blur(8px);
+  /* Highly reflective top and left edges */
+  border-top: 1px solid rgba(0, 240, 255, 0.4);
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+  border-right: 1px solid rgba(0, 0, 0, 0.5);
+  /* Inner glow to mimic light passing through water */
+  box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.05), 0 8px 32px rgba(0, 0, 0, 0.4);
+  transition: var(--transition-smooth);
+}
+
+/* Make the liquid glass "glow" even hotter when hovered */
+.project-card:hover .liquid-glass {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(255, 255, 255, 0.05));
+  box-shadow: inset 0 0 30px rgba(0, 240, 255, 0.1), 0 15px 40px rgba(0, 240, 255, 0.15);
+}
+
+/* ==========================================================================
+   9. RESPONSIVE ENGINE (TABLET & MOBILE)
+   ========================================================================== */
+
+/* --- TABLET VIEW (< 992px) --- */
+@media (max-width: 992px) {
+  /* Stack the Hero Section */
+  .hero-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 4rem;
+    padding-top: 2rem;
+  }
+  
+  .hero-text p {
+    margin: 0 auto 2.5rem auto; /* Centers the paragraph */
+  }
+  
+  .hero-cta {
+    justify-content: center;
+  }
+  
+  /* Stack the Support Section */
+  .support-container {
+    flex-direction: column;
+    gap: 4rem;
+  }
+  
+  /* Tighten the Work List for Tablet */
+  .project-card {
+    gap: 2rem;
+  }
+  
+  .project-thumb {
+    width: 50%;
+  }
+  
+  .project-info {
+    width: 50%;
+  }
+}
+
+/* --- MOBILE VIEW (< 768px) --- */
+@media (max-width: 768px) {
+  
+  /* Hide the custom cursor on touch devices */
+  .cursor-glow {
+    display: none !important; 
+  }
+
+  /* Simplify Navigation */
+  .nav-links a:not(.btn-nav-ticket) {
+    display: none; /* Hide standard links to save space */
+  }
+  
+  /* Scale Typography */
+  .hero-text h1 {
+    font-size: 2.2rem;
+    letter-spacing: -0.5px;
+  }
+  
+  .support-info h2 {
+    font-size: 1.8rem;
+  }
+
+  /* CRITICAL: Break the Alternating Grid */
+  .work-list {
+    gap: 5rem; /* Reduce the massive 8rem gap for mobile scrolling */
+  }
+
+  .project-card, 
+  .project-card:nth-child(even) {
+    flex-direction: column; /* Force everything to stack vertically */
+    gap: 1.5rem;
+  }
+  
+  .project-thumb, 
+  .project-info {
+    width: 100%; /* Take up the full width of the phone */
+  }
+  
+  .project-info {
+    padding: 0; /* Remove padding so text aligns cleanly with the image edges */
+    text-align: left;
+  }
+  
+  .project-info h3 {
+    font-size: 1.4rem;
+  }
+  
+  /* Adjust the Video Player Window */
+  .video-window {
+    border-radius: 8px; /* Slightly softer corners on mobile */
+  }
+}
+
+/* --- SMALL MOBILE (< 480px) --- */
+@media (max-width: 480px) {
+  .hero-text h1 {
+    font-size: 1.9rem;
+  }
+  
+  .hero-cta {
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+  
+  .hero-cta a {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .ticket-box {
+    padding: 1.5rem; /* Reduce thick padding on the form */
+  }
+}
+
+/* --- Studio Design Identity Variables --- */
+:root {
+  --bg-dark: #070b19;       /* Main canvas deep navy */
+  --bg-card: #0e1630;       /* Card background */
+  --accent-cyan: #00f5d4;   /* High-energy signature cyan */
+  --text-white: #ffffff;
+  --text-muted: #8fa0dd;
+}
+
+/* --- Section Container Layout --- */
+.portfolio-section {
+  background-color: var(--bg-dark);
+  padding: 90px 24px;
+}
+
+.portfolio-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-title {
+  color: var(--text-white);
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 45px;
+  text-transform: uppercase;
+}
+
+.section-title span {
+  color: var(--accent-cyan);
+}
+
+/* --- Responsive Auto-Grid (No Media Queries Required) --- */
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 28px;
+}
+
+/* --- 100% Borderless Project Card Layout --- */
+.project-card {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  border: none !important; /* Forces layout to strip any native browser outlines */
+  box-shadow: none !important; /* Guarantees flat structural interface */
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Elegant asymmetrical feature block for wide video layouts on desktop */
+@media (min-width: 950px) {
+  .project-card.featured {
+    grid-column: span 2;
+  }
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 16 / 10; /* Fixed cinematic viewport frame */
+}
+
+.project-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --- Dark Vignette Overlay Text Reveal --- */
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(7, 11, 25, 0.98) 15%, rgba(7, 11, 25, 0.3) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 28px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-overlay h3 {
+  color: var(--text-white);
+  font-size: 1.4rem;
+  margin: 0 0 6px 0;
+  font-weight: 700;
+}
+
+.card-overlay p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0 0 16px 0;
+}
+
+.action-text {
+  color: var(--accent-cyan);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* --- Clean Interactive Hover Mechanics (Desktop) --- */
+@media (hover: hover) {
+  .project-card:hover {
+    transform: translateY(-6px);
+  }
+  
+  .project-card:hover .project-img {
+    transform: scale(1.04);
+  }
+  
+  .project-card:hover .card-overlay {
+    opacity: 1;
+  }
+}
+
+/* --- KILL THE LIGHT BOX WRAPPER BEHIND TEXT AND IMAGES --- */
+.project-card, 
+.project-card.frosted-glass, 
+.project-card.liquid-glass {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* ==========================================================================
+   HOMEPAGE SHOWROOM ARCHIVE CTA BUTTON
+   ========================================================================== */
+.btn-archive-view {
+  display: inline-block;
+  text-decoration: none;
+  padding: 1rem 2.5rem;
+  background: transparent;
+  color: #00ffff !important; /* Vibrant cyan text */
+  border: 2px solid #00ffff; /* Solid cyan outline border frame */
+  border-radius: 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Premium Hover Fill Inverted Animation Interaction Effects */
+.btn-archive-view:hover {
+  background: #00ffff; /* Smooth color inversion fill */
+  color: #060a13 !important; /* Inverts text back to deep navy */
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.4); /* Subtle ambient cyan glow */
+  transform: translateY(-3px); /* Subtle physics lift acceleration */
+}
+
+/* Click feedback effect state */
+.btn-archive-view:active {
+  transform: translateY(-1px);
+}

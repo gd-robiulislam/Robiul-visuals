@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Showroom Archive | Robiul Visuals</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body style="background: #060a13; color: #fff; padding-top: 100px;">
+
+  <nav class="studio-nav">
+    <div class="nav-container">
+      <a href="index.html" class="brand-logo">ROBIUL VISUALS<span style="color:#00ffff;">.</span></a>
+      <div class="nav-links">
+        <a href="index.html#work">Home</a>
+        <a href="index.html#contact" class="btn-nav-ticket">Open Ticket</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="archive-header" style="max-width: 1200px; margin: 2rem auto; padding: 0 2rem;">
+    <h1 style="font-size: 2.5rem; margin-bottom: 1.5rem; text-transform: uppercase; font-weight: 800;">Production Showroom</h1>
+    
+    <div class="filter-ui-row" style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem;">
+      <button class="filter-trigger active" onclick="filterGallery('all')" style="background: #00ffff; color: #060a13; border: 1px solid #00ffff; padding: 0.6rem 1.5rem; border-radius: 4px; font-weight: 600; cursor: pointer; transition: 0.3s;">All Productions</button>
+      <button class="filter-trigger" onclick="filterGallery('automotive')" style="background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 0.6rem 1.5rem; border-radius: 4px; font-weight: 600; cursor: pointer; transition: 0.3s;">Automotive</button>
+      <button class="filter-trigger" onclick="filterGallery('motion')" style="background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 0.6rem 1.5rem; border-radius: 4px; font-weight: 600; cursor: pointer; transition: 0.3s;">Motion / SaaS</button>
+    </div>
+  </section>
+
+  <main class="work-grid" id="archive-rendering-vault" style="max-width: 1200px; margin: 0 auto; padding: 0 2rem 5rem 2rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2.5rem;">
+    </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSy...", // Use your real configuration values here
+      authDomain: "its-robiul-project.firebaseapp.com",
+      projectId: "its-robiul-project",
+      storageBucket: "its-robiul-project.firebasestorage.app",
+      messagingSenderId: "67384048870",
+      appId: "1:67384048870:web:..." 
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const archiveVault = document.getElementById('archive-rendering-vault');
+
+    // Pull ALL project entries from Firestore to compile the complete catalogue matrix
+    db.collection("projects").orderBy("createdAt", "desc").get().then((querySnapshot) => {
+      archiveVault.innerHTML = "";
+      
+      querySnapshot.forEach((doc) => {
+        const item = doc.data();
+        
+        // Render every single grid card block framework, assigning their data-tag parameter identifiers
+        archiveVault.innerHTML += `
+          <div class="project-card-container-block" data-category="${item.filterTag || 'all'}" style="background: #0d1527; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); transition: transform 0.3s ease;">
+            <div style="width: 100%; height: 220px; overflow: hidden; background: #000;">
+              <img src="${item.thumbnail}" alt="" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.85;">
+            </div>
+            <div style="padding: 1.5rem;">
+              <span style="color: #00ffff; font-size: 0.8rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">${item.category}</span>
+              <h3 style="font-size: 1.4rem; margin: 0.5rem 0 1rem 0; text-transform: uppercase; color: #fff;">${item.title}</h3>
+              <a href="case-study.html?id=${doc.id}" style="color: #fff; text-decoration: none; font-size: 0.9rem; font-weight: 600; display: inline-block; border-bottom: 1px solid #00ffff; padding-bottom: 2px;">Watch Reel &rarr;</a>
+            </div>
+          </div>
+        `;
+      });
+    });
+
+    // Instant non-reloading active view presentation matrix filter engine
+    function filterGallery(targetTag) {
+      const cards = document.querySelectorAll('.project-card-container-block');
+      const buttons = document.querySelectorAll('.filter-trigger');
+      
+      // Update toggle buttons active focus states visually
+      buttons.forEach(btn => {
+        btn.style.background = "transparent";
+        btn.style.color = "#fff";
+        btn.style.borderColor = "rgba(255,255,255,0.1)";
+      });
+      event.target.style.background = "#00ffff";
+      event.target.style.color = "#060a13";
+      event.target.style.borderColor = "#00ffff";
+
+      // Hide or exhibit elements instantly on the interface matrix viewport layout display layers
+      cards.forEach(card => {
+        const elementCategory = card.getAttribute('data-category');
+        if (targetTag === 'all' || elementCategory === targetTag) {
+          card.style.display = "block";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    }
+  </script>
+</body>
+</html>

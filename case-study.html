@@ -28,34 +28,72 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <script>
-    // Paste your exact keys here just like at the bottom of index.html
     const firebaseConfig = {
-      apiKey: "AIzaSyAR7BTzvAftYn4QYLXxL5N8wKm5Fz7zw9I", // Put your actual API key here
+      apiKey: "AIzaSyAR7BTzvAftYn4QYLXxL5N8wKm5Fz7zw9I", 
       authDomain: "its-robiul-project.firebaseapp.com",
       projectId: "its-robiul-project",
       storageBucket: "its-robiul-project.firebasestorage.app",
       messagingSenderId: "67384048870",
-      appId: "1:673848048870:web:8e6acaf6d156a4e0cecf27" // Put your actual App ID here
+      appId: "1:673848048870:web:8e6acaf6d156a4e0cecf27" 
     };
 
-    // Start the Firebase stream engine
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
   </script>
 
   <script>
-    // Identify which project record to look up based on the current active URL link address parameter
     const queryParameters = new URLSearchParams(window.location.search);
     const activeDocId = queryParameters.get('id');
     const viewportContainer = document.getElementById('case-study-viewport');
 
     if (activeDocId) {
-      // Fetch the corresponding custom metadata node document tracking row inside Firestore
       db.collection("projects").doc(activeDocId).get().then((doc) => {
         if (doc.exists) {
           const projectDetails = doc.data();
+          const rawUrl = projectDetails.videoUrl || '';
 
-          // Inject the data properties directly inside your premium responsive layout windows
+          // 1. SMART PLAYER ROUTER SETUP
+          // This piece variable holds the customized HTML code depending on the web platform link type
+          let mediaElementMarkup = "";
+
+          if (rawUrl.includes('youtu')) {
+            let videoId = '';
+            
+            // Extract the true YouTube asset ID across standard, shorts, or sharing URL types
+            if (rawUrl.includes('shorts/')) {
+              videoId = rawUrl.split('shorts/')[1].split('?')[0];
+            } else if (rawUrl.includes('youtu.be/')) {
+              videoId = rawUrl.split('youtu.be/')[1].split('?')[0];
+            } else {
+              videoId = rawUrl.split('v=')[1].split('&')[0];
+            }
+
+            // High-performance background embed configuration (Autoplay, Loop, Mute controls enabled)
+            mediaElementMarkup = `
+              <iframe 
+                src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=1&rel=0" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; background: #000; object-fit: cover;">
+              </iframe>
+            `;
+          } else {
+            // Native direct file component fallback engine if using standard cloud media assets
+            mediaElementMarkup = `
+              <video class="hero-video" 
+                controls 
+                autoplay 
+                muted 
+                playsinline
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; background: #000; object-fit: cover;">
+                <source src="${rawUrl}" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            `;
+          }
+
+          // 2. LAYOUT RENDERING ENGINE CANVAS
           viewportContainer.innerHTML = `
             <div class="hero-container" style="display: flex; gap: 4rem; max-width: 1200px; margin: 0 auto; padding: 2rem; width: 100%; flex-wrap: wrap;">
               
@@ -77,15 +115,7 @@
                     <span class="window-title" style="color: rgba(255,255,255,0.4); font-size: 0.8rem; font-family: monospace; margin-left: 0.5rem;">render_engine.mp4</span>
                   </div>
                   <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-                  <video class="hero-video" 
-                      controls 
-                      autoplay 
-                      muted 
-                      playsinline
-                      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; background: #000; object-fit: cover;">
-                      <source src="${projectDetails.videoUrl}" type="video/mp4">
-                      Your browser does not support the video tag.
-                    </video>
+                    ${mediaElementMarkup}
                   </div>
                 </div>
               </div>

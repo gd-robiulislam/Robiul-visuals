@@ -974,3 +974,19 @@ img, video {
 .btn-archive-view:active {
   transform: translateY(-1px);
 }
+
+/* Support Ticket Spam Notification Micro-Copy */
+.spam-warning-note {
+  display: block;
+  margin-top: 1.2rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.4); /* Dimmed out so it doesn't clutter the UI */
+  text-align: left;
+}
+
+.spam-warning-note strong {
+  color: #00ffff; /* Highlights the folder in your signature cyan accent */
+  font-weight: 600;
+}

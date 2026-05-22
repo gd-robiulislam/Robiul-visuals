@@ -77,6 +77,33 @@
   </a>
 </div>
 
+  <button id="ai-toggle-btn" style="position: fixed; bottom: 30px; right: 30px; z-index: 1000; background: #060a13; color: #00ffff; border: 1px solid #00ffff; border-radius: 50px; padding: 1rem 2rem; font-family: monospace; font-size: 0.9rem; font-weight: bold; cursor: pointer; box-shadow: 0 0 15px rgba(0, 255, 255, 0.3); transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem;">
+  <span style="width: 8px; height: 8px; border-radius: 50%; background: #00ffff; box-shadow: 0 0 8px #00ffff;"></span>
+  EXEC_AI_CORE
+</button>
+
+<div id="ai-sidebar" style="position: fixed; top: 0; right: -450px; width: 100%; max-width: 450px; height: 100vh; background: #0d1527; z-index: 1001; box-shadow: -10px 0 30px rgba(0,0,0,0.5); border-left: 1px solid rgba(0, 255, 255, 0.1); transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column;">
+  
+  <div style="background: #090e1a; padding: 1.2rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05);">
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <span style="width: 8px; height: 8px; border-radius: 50%; background: #00ffff; box-shadow: 0 0 8px #00ffff;"></span>
+      <span style="color: #00ffff; font-family: monospace; font-size: 0.8rem; letter-spacing: 1px;">AI_CORE_v1.0b // OPT_B</span>
+    </div>
+    <button id="ai-close-btn" style="background: transparent; border: none; color: rgba(255,255,255,0.4); font-size: 1.2rem; cursor: pointer; font-family: monospace; transition: color 0.3s;">&times;</button>
+  </div>
+
+  <div id="terminal-output-box" style="flex: 1; padding: 1.5rem; overflow-y: auto; font-family: monospace; font-size: 0.9rem; line-height: 1.6; color: rgba(255,255,255,0.85); background: #070d1a; display: flex; flex-direction: column; gap: 1.2rem;">
+    <div style="color: #00ffff;">[SYS_INIT] Core online. Syncing dynamically with Firestore project schemas... Connected.</div>
+    <div style="color: rgba(255,255,255,0.5);">AI: Workspace interface initialized. I can parse our active project showcase reels, detail creation metrics, or queue support ticket pipelines directly. How can I assist you?</div>
+  </div>
+
+  <form id="terminal-input-form" style="display: flex; background: #090e1a; border-top: 1px solid rgba(255,255,255,0.05);">
+    <span style="color: #00ffff; padding: 1.2rem 0 1.2rem 1.2rem; font-family: monospace; font-weight: bold;">&gt;</span>
+    <input type="text" id="terminal-user-input" placeholder="Execute system inquiry parameter..." autocomplete="off" style="flex: 1; background: transparent; border: none; padding: 1.2rem 0.8rem; color: #fff; font-family: monospace; font-size: 0.9rem; outline: none;">
+    <button type="submit" style="background: transparent; border: none; color: #00ffff; padding: 0 1.5rem; font-family: monospace; font-weight: bold; cursor: pointer;">RUN</button>
+  </form>
+</div>
+
     <section id="support" class="support-section">
         <div class="support-container">
             <div class="support-info">
@@ -186,6 +213,86 @@
     
     console.log("Firebase Database successfully connected!", db);
   </script>
+
+<script>
+  const sidebar = document.getElementById('ai-sidebar');
+  const toggleBtn = document.getElementById('ai-toggle-btn');
+  const closeBtn = document.getElementById('ai-close-btn');
+  const terminalForm = document.getElementById('terminal-input-form');
+  const userInputField = document.getElementById('terminal-user-input');
+  const outputDisplay = document.getElementById('terminal-output-box');
+
+  let chatContextHistory = [];
+  let systemPendingAction = false;
+  let storedActionArguments = null;
+
+  // Set your exact deployed Cloudflare Worker URL link address here
+  const workerEndpointUrl = "robiul-ai-agent.robiulislam66178.workers.dev";
+
+  // SLIDE SIDEBAR TOGGLE HANDLERS
+  toggleBtn.addEventListener('click', () => { sidebar.style.right = '0px'; });
+  closeBtn.addEventListener('click', () => { sidebar.style.right = '-450px'; });
+  closeBtn.addEventListener('mouseover', () => { closeBtn.style.color = '#00ffff'; });
+  closeBtn.addEventListener('mouseout', () => { closeBtn.style.color = 'rgba(255,255,255,0.4)'; });
+
+  // COMMAND STREAM PROCESSING INTERFACE
+  terminalForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const rawInputText = userInputField.value.trim();
+    if (!rawInputText) return;
+
+    outputDisplay.innerHTML += `<div style="text-align: right; color: rgba(255,255,255,0.6);"><span style="color: #fff;">User:</span> ${rawInputText}</div>`;
+    userInputField.value = '';
+    outputDisplay.scrollTop = outputDisplay.scrollHeight;
+
+    const loadingId = 'sys-load-' + Date.now();
+    outputDisplay.innerHTML += `<div id="${loadingId}" style="color: #00ffff; font-family: monospace;">[PROCESSING_REQUEST]...</div>`;
+    outputDisplay.scrollTop = outputDisplay.scrollHeight;
+
+    let payload = {
+      message: rawInputText,
+      history: chatContextHistory,
+      ticketConfirmed: false,
+      pendingTicketData: null
+    };
+
+    if (systemPendingAction && rawInputText.toLowerCase().includes('yes')) {
+      payload.ticketConfirmed = true;
+      payload.pendingTicketData = storedActionArguments;
+    }
+
+    try {
+      const serverResponse = await fetch(workerEndpointUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await serverResponse.json();
+      document.getElementById(loadingId).remove();
+
+      if (data.actionRequired) {
+        systemPendingAction = true;
+        storedActionArguments = data.pendingTicketData;
+      } else if (data.ticketCleared) {
+        systemPendingAction = false;
+        storedActionArguments = null;
+      }
+
+      let formattedResponse = data.response.replace(/\n/g, '<br>');
+      outputDisplay.innerHTML += `<div style="margin-bottom: 0.5rem;"><span style="color: #00ffff;">AI:</span> ${formattedResponse}</div>`;
+      outputDisplay.scrollTop = outputDisplay.scrollHeight;
+
+      chatContextHistory.push({ role: 'user', content: rawInputText });
+      chatContextHistory.push({ role: 'assistant', content: data.response });
+
+    } catch (err) {
+      document.getElementById(loadingId).remove();
+      outputDisplay.innerHTML += `<div style="color: #ff5f56;">[ERR_SYS_CORE_BREAKDOWN]</div>`;
+      outputDisplay.scrollTop = outputDisplay.scrollHeight;
+    }
+  });
+</script>
 
 </body>
 </html>

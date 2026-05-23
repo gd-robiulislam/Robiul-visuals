@@ -147,15 +147,24 @@
     });
 
     // SECURE REAL-TIME NOTIFICATION TOKEN HANDSHAKE REGISTRATION
+    // SECURE REAL-TIME NOTIFICATION TOKEN HANDSHAKE REGISTRATION
     async function requestNotificationPermission(user) {
       if (!messaging) return;
       try {
         const permission = await Notification.requestPermission();
         if (permission !== 'granted') return;
 
-        // CRITICAL: Make sure to replace this placeholder with your exact Web Push Key pair string from Firebase Console!
+        // 1. Explicitly register and wait for the service worker to become fully active
+        console.log("Synchronizing background service worker thread...");
+        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        
+        // Wait loop if the worker is still installing or waiting
+        await navigator.serviceWorker.ready;
+
+        // 2. Fetch the token passing the active ready registration node
         const currentToken = await messaging.getToken({ 
-          vapidKey: "1qTI5JBaqLyfQ39Ako-qkXJBtP4tnafQxRCLPIyyzwA" 
+          vapidKey: "YOUR_LONG_GENERATED_KEY_PAIR_STRING_FROM_FIREBASE_CONSOLE",
+          serviceWorkerRegistration: registration
         });
         
         if (currentToken) {
@@ -164,7 +173,7 @@
             email: user.email,
             deviceUpdated: firebase.firestore.FieldValue.serverTimestamp()
           });
-          console.log("Notification token sync complete.");
+          console.log("Notification token sync complete. Node armed!");
         }
       } catch (err) {
         console.error("Token transmission error: ", err);

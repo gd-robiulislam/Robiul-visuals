@@ -97,6 +97,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js"></script>
 
   <script>
     const firebaseConfig = {
@@ -111,6 +112,13 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
+    
+    let messaging = null;
+    try {
+      messaging = firebase.messaging();
+    } catch (e) {
+      console.log("Messaging setup context bypassed on local environment engine.");
+    }
   </script>
 
   <script>
@@ -138,15 +146,39 @@
       }
     });
 
+    // SECURE REAL-TIME NOTIFICATION TOKEN HANDSHAKE REGISTRATION
+    async function requestNotificationPermission(user) {
+      if (!messaging) return;
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') return;
+
+        // CRITICAL: Make sure to replace this placeholder with your exact Web Push Key pair string from Firebase Console!
+        const currentToken = await messaging.getToken({ 
+          vapidKey: "YOUR_LONG_GENERATED_KEY_PAIR_STRING_FROM_FIREBASE_CONSOLE" 
+        });
+        
+        if (currentToken) {
+          await db.collection("notification_tokens").doc(user.uid).set({
+            token: currentToken,
+            email: user.email,
+            deviceUpdated: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          console.log("Notification token sync complete.");
+        }
+      } catch (err) {
+        console.error("Token transmission error: ", err);
+      }
+    }
+
     // 1. STRENGTHENED AUTH STATE OBSERVATION CONSOLE
     auth.onAuthStateChanged((user) => {
       if (user) {
-        // SAFETY SHIELD: Enforce validation constraint checkpoint
         if (!user.emailVerified && user.email !== "robiulislam66178@gmail.com") {
           userDisplayTag.innerText = `[NOTICE: Verify email link sent to ${user.email}]`;
           loggedOutDiv.style.display = "none";
           loggedInDiv.style.display = "flex";
-          editorControlRow.style.display = "none"; // Keeps posting blocked until verified
+          editorControlRow.style.display = "none"; 
           currentSessionUser = null;
           return;
         }
@@ -154,8 +186,11 @@
         currentSessionUser = user;
         loggedOutDiv.style.display = "none";
         loggedInDiv.style.display = "flex";
-        editorControlRow.style.display = "flex"; // Unlocks posting form window
+        editorControlRow.style.display = "flex"; 
         userDisplayTag.innerText = `[CONNECTED_USER: ${user.email}]`;
+        
+        // Auto-run subscription check instantly on login node
+        requestNotificationPermission(user);
       } else {
         currentSessionUser = null;
         loggedOutDiv.style.display = "flex";
@@ -172,7 +207,6 @@
       if(!email || !pass) return alert("Fill in email and password parameters.");
       try { 
         const credential = await auth.createUserWithEmailAndPassword(email, pass);
-        // Fire automated secure verification link immediately
         await credential.user.sendEmailVerification();
         alert("Registration recorded! A verification email link has been routed to your inbox. Please click it to validate authenticity parameters.");
       } catch(err) { alert(err.message); }
@@ -204,7 +238,7 @@
       togglePostBtn.style.background = '#0f172a';
     }
 
-  // FIXED DATA POST COMMIT EXECUTION WITH TOKEN RE-SYNC
+    // FIXED DATA POST COMMIT EXECUTION WITH TOKEN RE-SYNC & WORKER BROADCAST
     postForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!currentSessionUser) return;
@@ -213,20 +247,17 @@
       const content = document.getElementById('forum-content').value.trim();
 
       try {
-        // FORCE RE-SYNC: Reloads user profile data & updates emailVerified status live
         await auth.currentUser.reload();
         const updatedUser = auth.currentUser;
 
-        // Double check validation status on the client side before hitting database rules
         if (!updatedUser.emailVerified && updatedUser.email !== "robiulislam66178@gmail.com") {
           alert("Your local session shows as unverified. Please refresh the page or re-click the link sent to your inbox!");
           return;
         }
 
-        // Force Firebase to generate a fresh token containing the new verified status flag
         await updatedUser.getIdToken(true);
 
-        // Commits cleanly now that security tokens match the backend rules criteria
+        // 1. Commit post log node cleanly inside Firestore core collection
         await db.collection("community_posts").add({
           author: updatedUser.email.split('@')[0], 
           authorEmail: updatedUser.email,
@@ -234,6 +265,22 @@
           content: content,
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
+
+        // 2. Clear out worker broadcast ping straight to your dedicated service instance
+        try {
+          await fetch("https://robiul-community-notifications.robiulislam66178.workers.dev/api/publish-post", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              title: title,
+              content: content,
+              author: updatedUser.email.split('@')[0] === "robiulam66178" ? "Robiul Islam" : updatedUser.email.split('@')[0]
+            })
+          });
+          console.log("Push notification broadcasted cleanly via Worker middleware.");
+        } catch (pushErr) {
+          console.error("Worker signaling failed: ", pushErr);
+        }
 
         postForm.reset();
         setTimeout(closePostBox, 500);

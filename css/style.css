@@ -990,3 +990,21 @@ img, video {
   color: #00ffff; /* Highlights the folder in your signature cyan accent */
   font-weight: 600;
 }
+
+/* Founder Verification Badge Style */
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-left: 6px;
+  background: #00bfff; /* Deep sky blue authority color */
+  color: #060a13; /* Matches your dark background color for the checkmark */
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: bold;
+  vertical-align: middle;
+  box-shadow: 0 0 8px rgba(0, 191, 255, 0.4); /* Subtle blue glow */
+}
+

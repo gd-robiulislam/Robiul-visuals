@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Hub | Robiul Visuals</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: #f4f6f9; color: #1e293b; font-family: sans-serif; margin: 0; }
+    .forum-container { max-width: 850px; margin: 0 auto; padding: 100px 2rem 5rem 2rem; }
+    .forum-title { font-size: 2.5rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2rem; color: #0f172a; }
+    .forum-title span { color: #008080; }
+    
+    /* Spacious Auth Portal Box */
+    .auth-box { background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.06); border-radius: 12px; padding: 2rem; margin-bottom: 2.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+    .auth-header { display: flex; flex-direction: column; gap: 1.5rem; }
+    @media (min-width: 768px) {
+      .auth-header { flex-direction: row; align-items: center; justify-content: space-between; }
+    }
+    .auth-user-info { font-family: monospace; font-size: 0.95rem; color: #64748b; margin-bottom: 0.5rem; display: block; }
+    
+    /* Expanded Form Control Layouts */
+    .auth-fields-wrapper { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; width: 100%; max-width: 650px; }
+    .input-group { position: relative; flex: 1; min-width: 200px; }
+    
+    .forum-input, .forum-textarea { width: 100%; background: #f8fafc; border: 1px solid rgba(0,0,0,0.1); border-radius: 6px; padding: 0.9rem 1rem; color: #0f172a; font-size: 0.95rem; outline: none; margin-bottom: 0; box-sizing: border-box; transition: all 0.3s; }
+    .forum-input:focus, .forum-textarea:focus { border-color: #008080; background: #ffffff; box-shadow: 0 0 10px rgba(0, 128, 128, 0.1); }
+    .forum-textarea { height: 120px; resize: vertical; margin-bottom: 1rem; }
+    
+    /* Password Reveal Toggle Icon */
+    .password-toggle-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b; font-size: 1.1rem; user-select: none; font-family: sans-serif; }
+    .password-toggle-icon:hover { color: #0f172a; }
+    
+    /* Interactive Button Array Matrix */
+    .btn-dark { background: #0f172a; color: #ffffff; border: none; padding: 0.9rem 1.8rem; font-family: monospace; font-weight: bold; font-size: 0.9rem; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; white-space: nowrap; }
+    .btn-dark:hover { background: #1e293b; }
+    .btn-forum-post { background: #0f172a; color: #ffffff; border: none; padding: 0.8rem 2rem; font-family: monospace; font-weight: bold; border-radius: 4px; cursor: pointer; transition: all 0.3s; width: 100%; }
+    .btn-forum-post:hover { background: #008080; box-shadow: 0 5px 15px rgba(0, 128, 128, 0.2); }
+    .btn-outline { background: transparent; color: #0f172a; border: 1px solid #0f172a; padding: 0.8rem 1.5rem; font-family: monospace; font-weight: bold; border-radius: 6px; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
+    .btn-outline:hover { background: #0f172a; color: #fff; }
+
+    /* Feed Cards */
+    .posts-feed { display: flex; flex-direction: column; gap: 1.5rem; }
+    .forum-post-card { background: #ffffff; padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.05); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+    .post-meta { margin-bottom: 0.8rem; font-family: monospace; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
+    .forum-post-card h3 { color: #0f172a; margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 700; text-transform: uppercase; }
+    .forum-post-card p { color: #1e293b; font-size: 0.95rem; line-height: 1.6; margin: 0; white-space: pre-wrap; }
+    
+    .verified-badge { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; background: #0056b3; color: #ffffff; border-radius: 50%; font-size: 9px; font-weight: bold; vertical-align: middle; }
+  </style>
+</head>
+<body>
+
+  <div class="forum-container">
+    <h1 class="forum-title">Community <span>Forum</span></h1>
+
+    <div class="auth-box">
+      <div id="auth-logged-out" class="auth-header">
+        <span class="auth-user-info">[STATUS: GUEST MODE]<br><span style="font-size:0.8rem; color:#94a3b8;">Log in to post. New accounts require verification links.</span></span>
+        <div class="auth-fields-wrapper">
+          <div class="input-group">
+            <input type="email" id="auth-email" placeholder="Email Address" class="forum-input" autocomplete="email">
+          </div>
+          <div class="input-group">
+            <input type="password" id="auth-password" placeholder="Password" class="forum-input">
+            <span id="password-toggle-trigger" class="password-toggle-icon">👁️</span>
+          </div>
+          <button id="btn-login" class="btn-dark">SIGN IN</button>
+          <button id="btn-register" class="btn-outline">REGISTER</button>
+        </div>
+      </div>
+      <div id="auth-logged-in" class="auth-header" style="display: none;">
+        <span id="user-display-tag" class="auth-user-info" style="color: #008080; font-weight: bold;"></span>
+        <button id="btn-logout" class="btn-outline" style="color: #ef4444; border-color: #ef4444;">LOGOUT</button>
+      </div>
+    </div>
+
+    <div id="editor-control-row" style="display: none; justify-content: flex-start; margin-bottom: 1.5rem;">
+      <button id="toggle-post-box-btn" class="btn-dark">+ CREATE NEW POST</button>
+    </div>
+
+    <div id="collapsible-post-box" style="max-height: 0px; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1); margin-bottom: 0rem;">
+      <div class="post-box">
+        <form id="forum-post-form">
+          <input type="text" id="forum-title" class="forum-input" placeholder="Topic Title / Project Name" style="margin-bottom:1rem;" required autocomplete="off">
+          <textarea id="forum-content" class="forum-textarea" placeholder="Share your link, ask a question, or drop design feedback parameters..." required></textarea>
+          <button type="submit" class="btn-forum-post">PUBLISH POST TO FEED</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="posts-feed" id="forum-feed-viewport">
+      <div style="text-align: center; color: rgba(0,0,0,0.4); font-family: monospace;">Syncing core community feed nodes...</div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAR7BTzvAftYn4QYLXxL5N8wKm5Fz7zw9I",
+      authDomain: "its-robiul-project.firebaseapp.com",
+      projectId: "its-robiul-project",
+      storageBucket: "its-robiul-project.firebasestorage.app",
+      messagingSenderId: "67384048870",
+      appId: "1:673848048870:web:8e6acaf6d156a4e0cecf27"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+  </script>
+
+  <script>
+    const loggedOutDiv = document.getElementById('auth-logged-out');
+    const loggedInDiv = document.getElementById('auth-logged-in');
+    const userDisplayTag = document.getElementById('user-display-tag');
+    const editorControlRow = document.getElementById('editor-control-row');
+    const togglePostBtn = document.getElementById('toggle-post-box-btn');
+    const collapsibleBox = document.getElementById('collapsible-post-box');
+    const postForm = document.getElementById('forum-post-form');
+    const feedViewport = document.getElementById('forum-feed-viewport');
+    const passwordField = document.getElementById('auth-password');
+    const passwordToggle = document.getElementById('password-toggle-trigger');
+
+    let currentSessionUser = null;
+
+    // SHOW/HIDE PASSWORD REVEAL CONTROLLER
+    passwordToggle.addEventListener('click', () => {
+      if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        passwordToggle.innerText = '🙈';
+      } else {
+        passwordField.type = 'password';
+        passwordToggle.innerText = '👁️';
+      }
+    });
+
+    // 1. STRENGTHENED AUTH STATE OBSERVATION CONSOLE
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        // SAFETY SHIELD: Enforce validation constraint checkpoint
+        if (!user.emailVerified && user.email !== "robiulislam66178@gmail.com") {
+          userDisplayTag.innerText = `[NOTICE: Verify email link sent to ${user.email}]`;
+          loggedOutDiv.style.display = "none";
+          loggedInDiv.style.display = "flex";
+          editorControlRow.style.display = "none"; // Keeps posting blocked until verified
+          currentSessionUser = null;
+          return;
+        }
+
+        currentSessionUser = user;
+        loggedOutDiv.style.display = "none";
+        loggedInDiv.style.display = "flex";
+        editorControlRow.style.display = "flex"; // Unlocks posting form window
+        userDisplayTag.innerText = `[CONNECTED_USER: ${user.email}]`;
+      } else {
+        currentSessionUser = null;
+        loggedOutDiv.style.display = "flex";
+        loggedInDiv.style.display = "none";
+        editorControlRow.style.display = "none";
+        closePostBox();
+      }
+    });
+
+    // SIGN UP PIPELINE WITH EMAIL VERIFICATION FORWARDING
+    document.getElementById('btn-register').addEventListener('click', async () => {
+      const email = document.getElementById('auth-email').value.trim();
+      const pass = document.getElementById('auth-password').value;
+      if(!email || !pass) return alert("Fill in email and password parameters.");
+      try { 
+        const credential = await auth.createUserWithEmailAndPassword(email, pass);
+        // Fire automated secure verification link immediately
+        await credential.user.sendEmailVerification();
+        alert("Registration recorded! A verification email link has been routed to your inbox. Please click it to validate authenticity parameters.");
+      } catch(err) { alert(err.message); }
+    });
+
+    document.getElementById('btn-login').addEventListener('click', async () => {
+      const email = document.getElementById('auth-email').value.trim();
+      const pass = document.getElementById('auth-password').value;
+      if(!email || !pass) return alert("Fill in email and password parameters.");
+      try { await auth.signInWithEmailAndPassword(email, pass); } catch(err) { alert(err.message); }
+    });
+
+    document.getElementById('btn-logout').addEventListener('click', () => auth.signOut());
+
+    // PANEL EXPANSION TRIGGERS
+    togglePostBtn.addEventListener('click', () => {
+      if (collapsibleBox.style.maxHeight === '0px' || !collapsibleBox.style.maxHeight) {
+        collapsibleBox.style.maxHeight = '500px';
+        togglePostBtn.innerText = '× CLOSE EDITOR';
+        togglePostBtn.style.background = '#ef4444';
+      } else {
+        closePostBox();
+      }
+    });
+
+    function closePostBox() {
+      collapsibleBox.style.maxHeight = '0px';
+      togglePostBtn.innerText = '+ CREATE NEW POST';
+      togglePostBtn.style.background = '#0f172a';
+    }
+
+  // FIXED DATA POST COMMIT EXECUTION WITH TOKEN RE-SYNC
+    postForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentSessionUser) return;
+      
+      const title = document.getElementById('forum-title').value.trim();
+      const content = document.getElementById('forum-content').value.trim();
+
+      try {
+        // FORCE RE-SYNC: Reloads user profile data & updates emailVerified status live
+        await auth.currentUser.reload();
+        const updatedUser = auth.currentUser;
+
+        // Double check validation status on the client side before hitting database rules
+        if (!updatedUser.emailVerified && updatedUser.email !== "robiulislam66178@gmail.com") {
+          alert("Your local session shows as unverified. Please refresh the page or re-click the link sent to your inbox!");
+          return;
+        }
+
+        // Force Firebase to generate a fresh token containing the new verified status flag
+        await updatedUser.getIdToken(true);
+
+        // Commits cleanly now that security tokens match the backend rules criteria
+        await db.collection("community_posts").add({
+          author: updatedUser.email.split('@')[0], 
+          authorEmail: updatedUser.email,
+          title: title,
+          content: content,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        postForm.reset();
+        setTimeout(closePostBox, 500);
+      } catch (err) {
+        alert("Database block rejection: " + err.message);
+      }
+    });
+
+    // REAL-TIME SYSTEM ENGINE LISTENER
+    db.collection("community_posts").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+      feedViewport.innerHTML = "";
+      if (snapshot.empty) {
+        feedViewport.innerHTML = `<div style="text-align:center; color:#64748b; font-family:monospace; padding:2rem;">No entries active in main branch database.</div>`;
+        return;
+      }
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const dateString = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : "Just now";
+        
+        let authorHandle = data.author || "User Node";
+        let badgeMarkup = "";
+
+        if (data.authorEmail === "robiulislam66178@gmail.com") {
+          authorHandle = "Robiul Islam";
+          badgeMarkup = `<span class="verified-badge" title="Verified Founder / Creator">&#10003;</span>`;
+        }
+
+        feedViewport.innerHTML += `
+          <div class="forum-post-card">
+            <div class="post-meta">
+              <span style="color: #0f172a; font-weight: bold;">${authorHandle}</span>${badgeMarkup}
+              <span style="color: #64748b; font-size: 0.8rem; margin-left: auto;">${dateString}</span>
+            </div>
+            <h3>${data.title}</h3>
+            <p>${data.content}</p>
+          </div>
+        `;
+      });
+    });
+  </script>
+</body>
+</html>

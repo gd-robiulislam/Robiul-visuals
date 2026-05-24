@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.itsrobiul.work.gd/sitemap.xml
+Sitemap: https://itsrobiul.work.gd/sitemap.xml

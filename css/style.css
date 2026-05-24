@@ -1224,3 +1224,9 @@ img, video {
         gap: 1.2rem;
     }
 }
+
+/* Tiny active bounce when a user clicks an emoji button */
+    .btn-react-node:active { 
+        transform: scale(0.95);
+        background: #e2e8f0;
+    }

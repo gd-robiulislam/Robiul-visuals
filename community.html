@@ -303,15 +303,50 @@
       }
     });
 
-    // ATOMIC FIELD INCREMENTATION HANDLER ENGINEFOR REACTION TRAYS
+    // UPGRADED: MUTUALLY EXCLUSIVE REACTION MATRIX (ALLOWS ONLY ONE REACTION PER POST)
     async function handleReactionIncrement(docId, reactionType) {
       const postReferenceNode = db.collection("community_posts").doc(docId);
+      
+      // Create a single unique storage key for this specific post doc item
+      const storageKey = `active_react_${docId}`;
+      
+      // Look up if this specific post already has an active chosen reaction selection locally
+      const currentActiveReaction = localStorage.getItem(storageKey);
+
       try {
+        // CASE 1: User has not reacted to this post yet at all
+        if (!currentActiveReaction) {
+          await postReferenceNode.update({
+            [`reactions.${reactionType}`]: firebase.firestore.FieldValue.increment(1)
+          });
+          localStorage.setItem(storageKey, reactionType);
+          console.log(`Registered initial exclusive reaction node: [${reactionType}]. Counter pushed +1.`);
+          return;
+        }
+
+        // CASE 2: User clicked the EXACT same reaction button again (Toggle off action)
+        if (currentActiveReaction === reactionType) {
+          await postReferenceNode.update({
+            [`reactions.${reactionType}`]: firebase.firestore.FieldValue.increment(-1)
+          });
+          localStorage.removeItem(storageKey);
+          console.log(`Toggled off existing active reaction node: [${reactionType}]. Counter pulled -1.`);
+          return;
+        }
+
+        // CASE 3: User changed their mind and clicked a completely different reaction button!
+        // We handle this cleanly by executing an atomic update: decrementing the old choice AND incrementing the new choice
         await postReferenceNode.update({
+          [`reactions.${currentActiveReaction}`]: firebase.firestore.FieldValue.increment(-1),
           [`reactions.${reactionType}`]: firebase.firestore.FieldValue.increment(1)
         });
+        
+        // Update local browser memory parameters to point to the new selected choice asset string
+        localStorage.setItem(storageKey, reactionType);
+        console.log(`Swapped exclusive reaction state seamlessly: From [${currentActiveReaction}] to [${reactionType}].`);
+
       } catch (rxErr) {
-        console.error("Atomic transaction blocking rule failure:", rxErr.message);
+        console.error("Atomic transaction exclusivity rule failure details:", rxErr.message);
       }
     }
 

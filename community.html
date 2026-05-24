@@ -382,7 +382,7 @@
         if (isPostOwner || isAdminConnected) {
           managementControlsMarkup = `
             <div class="post-management-actions" style="display: flex; gap: 0.5rem; margin-left: auto;">
-              // REPLACE YOUR EDIT BUTTON GENERATION LINE INSIDE THE SNAPSHOT LOOP WITH THIS:
+
               ${isPostOwner ? `<button onclick="triggerPostInlineEdit('${docId}', \`${data.title.replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`, \`${data.content.replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`, '${data.mediaType || 'none'}', \`${(data.mediaUrl || '').replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`)" style="background: transparent; border: 1px solid rgba(0,128,128,0.3); color: #008080; font-family: monospace; font-size: 0.75rem; font-weight: bold; cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 4px; transition: all 0.2s;">✏️ EDIT</button>` : ''}
               <button onclick="executePostDeletion('${docId}')" style="background: transparent; border: 1px solid rgba(239,68,68,0.2); color: #ef4444; font-family: monospace; font-size: 0.75rem; font-weight: bold; cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 4px; transition: all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.05)'" onmouseout="this.style.background='transparent'">
                 🗑️ DELETE ${isAdminConnected && !isPostOwner ? '(ADMIN)' : ''}

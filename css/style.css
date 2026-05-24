@@ -1008,3 +1008,219 @@ img, video {
   box-shadow: 0 0 8px rgba(0, 191, 255, 0.4); /* Subtle blue glow */
 }
 
+/* ==========================================================================
+   RESPONSIVE MOBILE NAV MENU DRAWER INTERFACE MATRIX 
+   ========================================================================== */
+
+/* 1. Base Hamburger Icon Configuration */
+.mobile-hamburger-trigger {
+    display: none; /* Hidden on big desktop viewport layers by default */
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 5px;
+    padding: 0.5rem;
+    z-index: 1005; /* Locks button visibility layer over sliding trays */
+    outline: none;
+}
+
+.hamburger-line-node {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background-color: #ffffff;
+    border-radius: 4px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 2. Fullscreen Slide-Out Drawer Panel */
+.mobile-navigation-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(6, 10, 19, 0.98); /* Matching your exact studio canvas black/navy token */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 1004;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* Off-screen shift configuration */
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Active transition state selector class */
+.mobile-navigation-overlay.is-visible {
+    transform: translateX(0);
+}
+
+/* 3. Link Structure Inside Vertical Drawer Container */
+.mobile-drawer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    width: 100%;
+    text-align: center;
+}
+
+.mobile-drawer-link {
+    color: #94a3b8;
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    transition: color 0.3s ease;
+}
+
+.mobile-drawer-link:hover {
+    color: #00ffff; /* Signature neon aqua highlight profile accent */
+}
+
+/* Open Ticket Action configuration layout for Mobile Trays */
+.mobile-drawer-ticket-btn {
+    background: transparent;
+    color: #00ffff;
+    border: 1px solid #00ffff;
+    padding: 0.8rem 2.5rem;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 0.95rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
+}
+
+.mobile-drawer-ticket-btn:hover {
+    background: rgba(0, 255, 255, 0.08);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.25);
+}
+
+/* 4. Morphing Hamburger Bars Animation Sequence to render "X" Close State */
+.mobile-hamburger-trigger.is-opened .hamburger-line-node:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+    background-color: #00ffff;
+}
+
+.mobile-hamburger-trigger.is-opened .hamburger-line-node:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-hamburger-trigger.is-opened .hamburger-line-node:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+    background-color: #00ffff;
+}
+
+/* ==========================================================================
+   MEDIA VIEWPORT BREAKPOINT CONFIGURATION ENGINE
+   ========================================================================== */
+@media (max-width: 768px) {
+    .desktop-nav-menu {
+        display: none !important; /* Forces old horizontal layout links to vanish */
+    }
+    
+    .mobile-hamburger-trigger {
+        display: flex; /* Snaps functional hamburger trigger lines onto mobile navigation bars */
+    }
+}
+
+/* ==========================================================================
+   DYNAMIC SCROLL-DRIVEN ENTRANCE ANIMATIONS
+   ========================================================================== */
+
+/* The hidden state for scroll elements */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+}
+
+/* The active state triggered via JavaScript when scrolled into view */
+.reveal-on-scroll.is-animated {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Staggered Delay Utilities (For items next to each other, like cards or buttons) */
+.delay-100 { transition-delay: 100ms; }
+.delay-200 { transition-delay: 200ms; }
+.delay-300 { transition-delay: 300ms; }
+
+/* ==========================================================================
+   STUDIO FOOTER SOCIAL INTEGRATION MATRIX
+   ========================================================================== */
+
+.studio-footer {
+    background: #060a13; /* Matches your core dark canvas background token */
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    padding: 2rem 0;
+    width: 100%;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.footer-copyright {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.footer-socials {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.social-link {
+    color: #94a3b8; /* Muted text color initially */
+    text-decoration: none;
+    font-family: monospace;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+
+/* Custom glowing accent transformations on hover */
+.social-link:hover {
+    color: #00ffff; /* Shifts cleanly to your signature neon cyan accent color */
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+    transform: translateY(-2px);
+}
+
+/* Responsive breakpoint handling for small mobile viewports */
+@media (max-width: 600px) {
+    .footer-container {
+        flex-direction: column-reverse;
+        text-align: center;
+    }
+    
+    .footer-socials {
+        justify-content: center;
+        gap: 1.2rem;
+    }
+}

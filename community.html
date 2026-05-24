@@ -350,13 +350,17 @@
       }
     }
 
-    // REAL-TIME SYSTEM ENGINE LISTENER UPGRADED FOR RICH MEDIA RENDER OBJECTS
+    // REAL-TIME FEED LISTENER (WITH USER EDIT/DELETE CONTROL SHIELDS)
     db.collection("community_posts").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
       feedViewport.innerHTML = "";
       if (snapshot.empty) {
         feedViewport.innerHTML = `<div style="text-align:center; color:#64748b; font-family:monospace; padding:2rem;">No entries active in main branch database.</div>`;
         return;
       }
+
+      // Identify who is currently browsing the hub
+      const connectedEmail = currentSessionUser ? currentSessionUser.email : null;
+      const isAdminConnected = connectedEmail === "robiulislam66178@gmail.com";
 
       snapshot.forEach((doc) => {
         const data = doc.data();
@@ -371,7 +375,23 @@
           badgeMarkup = `<span class="verified-badge" title="Verified Founder / Creator">&#10003;</span>`;
         }
 
-        // Parse and isolate attachment formats dynamically
+        // CONTROL ROW MATRIX: Determine if buttons should render based on post ownership or admin status
+        let managementControlsMarkup = "";
+        const isPostOwner = connectedEmail && data.authorEmail === connectedEmail;
+
+        if (isPostOwner || isAdminConnected) {
+          managementControlsMarkup = `
+            <div class="post-management-actions" style="display: flex; gap: 0.5rem; margin-left: auto;">
+              // REPLACE YOUR EDIT BUTTON GENERATION LINE INSIDE THE SNAPSHOT LOOP WITH THIS:
+              ${isPostOwner ? `<button onclick="triggerPostInlineEdit('${docId}', \`${data.title.replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`, \`${data.content.replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`, '${data.mediaType || 'none'}', \`${(data.mediaUrl || '').replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`)" style="background: transparent; border: 1px solid rgba(0,128,128,0.3); color: #008080; font-family: monospace; font-size: 0.75rem; font-weight: bold; cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 4px; transition: all 0.2s;">✏️ EDIT</button>` : ''}
+              <button onclick="executePostDeletion('${docId}')" style="background: transparent; border: 1px solid rgba(239,68,68,0.2); color: #ef4444; font-family: monospace; font-size: 0.75rem; font-weight: bold; cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 4px; transition: all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.05)'" onmouseout="this.style.background='transparent'">
+                🗑️ DELETE ${isAdminConnected && !isPostOwner ? '(ADMIN)' : ''}
+              </button>
+            </div>
+          `;
+        }
+
+        // Parse and render rich media attachments
         let mediaLayoutMarkup = "";
         if (data.mediaUrl && data.mediaType && data.mediaType !== "none") {
           const type = data.mediaType;
@@ -380,7 +400,7 @@
           if (type === "image" || type === "gif") {
             mediaLayoutMarkup = `
               <div class="rendered-media-wrapper">
-                <img src="${url}" class="media-node-img" alt="Community shared media resource content block" loading="lazy">
+                <img src="${url}" class="media-node-img" alt="Shared asset" loading="lazy">
               </div>`;
           } else if (type === "video") {
             if (url.includes("youtube.com") || url.includes("youtu.be")) {
@@ -410,22 +430,23 @@
           }
         }
 
-        // Safely pull reaction counts to protect older entries missing data keys
         const reactionMapData = data.reactions || { like: 0, fire: 0, heart: 0 };
         const likes = reactionMapData.like || 0;
         const fires = reactionMapData.fire || 0;
         const hearts = reactionMapData.heart || 0;
 
         feedViewport.innerHTML += `
-          <div class="forum-post-card">
+          <div class="forum-post-card" id="card-${docId}">
             <div class="post-meta">
               <span style="color: #0f172a; font-weight: bold;">${authorHandle}</span>${badgeMarkup}
-              <span style="color: #64748b; font-size: 0.8rem; margin-left: auto;">${dateString}</span>
+              <span style="color: #64748b; font-size: 0.8rem; margin-left: 1rem;">${dateString}</span>
+              ${managementControlsMarkup}
             </div>
-            <h3>${data.title}</h3>
-            <p>${data.content}</p>
-            
-            ${mediaLayoutMarkup}
+            <div id="content-display-${docId}">
+              <h3>${data.title}</h3>
+              <p>${data.content}</p>
+              ${mediaLayoutMarkup}
+            </div>
             
             <div class="reaction-tray">
               <button class="btn-react-node" onclick="handleReactionIncrement('${docId}', 'like')">👍 Like <span class="count-val">${likes}</span></button>
@@ -436,6 +457,75 @@
         `;
       });
     });
+
+    // ACTION ENGINE 1: INLINE COMPILATION CONSOLE FOR EDITING CHANNELS (WITH MEDIA SELECTION INTEGRATION)
+    function triggerPostInlineEdit(docId, currentTitle, currentContent, currentMediaType, currentMediaUrl) {
+      const displayBlock = document.getElementById(`content-display-${docId}`);
+      
+      // Fallback handlers to protect old database posts missing media attributes safely
+      const mediaType = currentMediaType || "none";
+      const mediaUrl = currentMediaUrl || "";
+      
+      displayBlock.innerHTML = `
+        <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid rgba(0,128,128,0.2); margin-top: 0.5rem;">
+          <input type="text" id="edit-title-${docId}" class="forum-input" value="${currentTitle}" style="margin-bottom: 0.5rem; background: #fff;">
+          <textarea id="edit-content-${docId}" class="forum-textarea" style="height: 80px; margin-bottom: 0.5rem; background: #fff;">${currentContent}</textarea>
+          
+          <div class="media-config-row" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <div style="flex: 1;">
+              <select id="edit-media-type-${docId}" class="forum-select" style="background: #fff; height: 42px; font-size: 0.85rem; padding: 0.5rem;">
+                <option value="none" ${mediaType === 'none' ? 'selected' : ''}>No Attachment</option>
+                <option value="image" ${mediaType === 'image' ? 'selected' : ''}>Static Image URL</option>
+                <option value="gif" ${mediaType === 'gif' ? 'selected' : ''}>Animated GIF Link</option>
+                <option value="video" ${mediaType === 'video' ? 'selected' : ''}>Video / YouTube Link</option>
+                <option value="link" ${mediaType === 'link' ? 'selected' : ''}>Website Link</option>
+              </select>
+            </div>
+            <div style="flex: 2;">
+              <input type="url" id="edit-media-url-${docId}" class="forum-input" value="${mediaUrl}" placeholder="Resource attachment URL..." style="background: #fff; padding: 0.6rem;">
+            </div>
+          </div>
+
+          <div style="display:flex; gap:0.5rem; margin-top: 0.8rem;">
+            <button onclick="commitPostUpdate('${docId}')" class="btn-dark" style="padding: 0.5rem 1rem; font-size: 0.8rem;">SAVE CHANGES</button>
+            <button onclick="location.reload()" class="btn-outline" style="padding: 0.5rem 1rem; font-size: 0.8rem;">CANCEL</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // ACTION ENGINE 2: PUSH ALL RECONFIGURED PROPERTIES (TEXT + MEDIA URLS) TO FIRESTORE MATRIX
+    async function commitPostUpdate(docId) {
+      const updatedTitle = document.getElementById(`edit-title-${docId}`).value.trim();
+      const updatedContent = document.getElementById(`edit-content-${docId}`).value.trim();
+      const updatedMediaType = document.getElementById(`edit-media-type-${docId}`).value;
+      const updatedMediaUrl = document.getElementById(`edit-media-url-${docId}`).value.trim();
+      
+      if (!updatedTitle || !updatedContent) return alert("Core post parameters cannot be blank.");
+
+      try {
+        await db.collection("community_posts").doc(docId).update({
+          title: updatedTitle,
+          content: updatedContent,
+          mediaType: updatedMediaType,
+          mediaUrl: updatedMediaType !== "none" ? updatedMediaUrl : ""
+        });
+        console.log(`Document node ${docId} successfully modified locally inside backend array.`);
+      } catch (err) {
+        alert("Update rejected by cloud firewall: " + err.message);
+      }
+    }
+
+    // ACTION ENGINE 3: COMPLETE DOCUMENT EXPUNGE CRITERIA
+    async function executePostDeletion(docId) {
+      if (!confirm("⚠️ Are you sure you want to permanently erase this post from the feed timeline?")) return;
+      try {
+        await db.collection("community_posts").doc(docId).delete();
+        console.log(`Node ${docId} vanished cleanly from Firestore.`);
+      } catch (err) {
+        alert("Action blocked by cloud firewall: " + err.message);
+      }
+    }
   </script>
 </body>
 </html>

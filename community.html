@@ -422,11 +422,42 @@
                   <video src="${url}" class="media-node-video" controls playsinline></video>
                 </div>`;
             }
-          } else if (type === "link") {
-            mediaLayoutMarkup = `
-              <div style="margin: 1rem 0;">
-                <a href="${url}" target="_blank" class="media-anchor-link-card">📂 LINK ATTACHMENT RESOURCE: ${url.replace('https://','').replace('http://','')} &rarr;</a>
-              </div>`;
+          }
+           else if (type === "link") {
+            // Check if the link points to a common editing file type or uses Google Drive
+            const isGitHubAsset = url.endsWith('.zip') || url.endsWith('.prproj') || url.endsWith('.aep') || url.endsWith('.ffx') || url.endsWith('.sfe');
+            const isGoogleDriveAsset = url.includes('drive.google.com/uc') || url.includes('export=download') || url.includes('drive.google.com/file/d/');
+            
+            if (isGitHubAsset || isGoogleDriveAsset) {
+              let assetName = "PRODUCTION_PRESET_ASSET";
+              let cleanDownloadUrl = url;
+
+              // Convert standard view-only Google links into forced direct background links automatically
+              if (isGoogleDriveAsset && url.includes('/file/d/')) {
+                // Safely slice out the distinct unique File ID block from the middle of the sharing url
+                const fileId = url.split('/file/d/')[1].split('/')[0];
+                cleanDownloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+                assetName = "DRIVE_RESOURCE_PACK.zip";
+              } else if (isGitHubAsset) {
+                assetName = url.substring(url.lastIndexOf('/') + 1);
+              } else {
+                assetName = "RESOURCE_BUNDLE.zip";
+              }
+
+              // Premium glowing container layout linked to our background worker function
+              mediaLayoutMarkup = `
+                <div style="margin: 1.2rem 0;" id="download-wrapper-${docId}">
+                  <button onclick="executeNativeBackgroundDownload('${cleanDownloadUrl}', '${assetName}', '${docId}')" class="media-anchor-link-card" style="display: block; width: 100%; padding: 1.2rem; background: #060a13; border: 2px solid #00ffff; color: #00ffff; border-radius: 8px; font-family: monospace; font-size: 0.9rem; cursor: pointer; text-align: center; box-shadow: 0 0 15px rgba(0, 255, 255, 0.12); transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.5px;">
+                    ⚡ DOWNLOAD PRESET: ${assetName} &rarr;
+                  </button>
+                </div>`;
+            } else {
+              // Keeps standard links working completely normally
+              mediaLayoutMarkup = `
+                <div style="margin: 1rem 0;">
+                  <a href="${url}" target="_blank" class="media-anchor-link-card">📂 LINK ATTACHMENT RESOURCE: ${url.replace('https://','').replace('http://','')} &rarr;</a>
+                </div>`;
+            }
           }
         }
 
@@ -526,6 +557,61 @@
         alert("Action blocked by cloud firewall: " + err.message);
       }
     }
+
+    // BACKGROUND BLOB DOWNLOADER ENGINE (KEEPS USERS ANCHORED ON THE SAME TAB)
+    async function executeNativeBackgroundDownload(targetUrl, fileName, docId) {
+      const targetWrapper = document.getElementById(`download-wrapper-${docId}`);
+      if (!targetWrapper) return;
+      
+      const fallbackBtnHTML = targetWrapper.innerHTML;
+
+      // Swap button styling into an active loading state instantly
+      targetWrapper.innerHTML = `
+        <button disabled class="media-anchor-link-card" style="display: block; width: 100%; padding: 1.2rem; background: #0f172a; border: 2px dashed #64748b; color: #64748b; border-radius: 8px; font-family: monospace; font-size: 0.9rem; text-align: center; cursor: not-allowed;">
+          ⏳ PIPING ASSET STREAM IN BACKGROUND... PLEASE WAIT
+        </button>`;
+
+      try {
+        // Stream the file chunks seamlessly into the local browser environment cache
+        const response = await fetch(targetUrl);
+        if (!response.ok) throw new Error("Stream block event recorded.");
+        
+        const fileBlob = await response.blob();
+        const localBlobUrl = window.URL.createObjectURL(fileBlob);
+        
+        // Spawn a invisible anchor to download natively without swapping window frames
+        const virtualAnchor = document.createElement('a');
+        virtualAnchor.href = localBlobUrl;
+        virtualAnchor.download = fileName;
+        document.body.appendChild(virtualAnchor);
+        
+        virtualAnchor.click();
+        
+        // Wipe local memory pointers instantly
+        document.body.removeChild(virtualAnchor);
+        window.URL.revokeObjectURL(localBlobUrl);
+
+        // Restore button state
+        targetWrapper.innerHTML = fallbackBtnHTML;
+        console.log(`Successfully completed native local deployment of ${fileName}.`);
+
+      } catch (err) {
+        console.warn("Direct stream fetch limited by CORS policy. Launching fallback download frame channel...", err.message);
+        targetWrapper.innerHTML = fallbackBtnHTML;
+        
+        // Safe Failover: Fires an invisible iframe download stream if third-party server headers block direct script reading
+        const hiddenIframeId = 'hidden-downloader-frame';
+        let hiddenIframe = document.getElementById(hiddenIframeId);
+        if (!hiddenIframe) {
+          hiddenIframe = document.createElement('iframe');
+          hiddenIframe.id = hiddenIframeId;
+          hiddenIframe.style.display = 'none';
+          document.body.appendChild(hiddenIframe);
+        }
+        hiddenIframe.src = targetUrl;
+      }
+    }
+    
   </script>
 </body>
 </html>

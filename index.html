@@ -21,14 +21,30 @@
     <nav class="studio-nav">
         <div class="nav-container">
             <a href="#" class="brand-logo">ROBIUL<span class="cyan-dot">.</span>VISUALS</a>
-            <div class="nav-links">
+            
+            <div class="nav-links desktop-nav-menu">
                 <a href="#work">Work</a>
                 <a href="projects.html">All Work</a>
                 <a href="community.html">Community</a>
                 <a href="#support" class="btn-nav-ticket">Open Ticket</a>
             </div>
+
+            <button class="mobile-hamburger-trigger" id="mobile-menu-toggle" aria-label="Toggle Navigation Drawer Menu">
+                <span class="hamburger-line-node"></span>
+                <span class="hamburger-line-node"></span>
+                <span class="hamburger-line-node"></span>
+            </button>
         </div>
     </nav>
+
+    <div class="mobile-navigation-overlay" id="mobile-navigation-overlay">
+        <div class="mobile-drawer-content">
+            <a href="#work" class="mobile-drawer-link">Work</a>
+            <a href="projects.html" class="mobile-drawer-link">All Work</a>
+            <a href="community.html" class="mobile-drawer-link">Community Hub</a>
+            <a href="#support" class="mobile-drawer-ticket-btn">Open Ticket</a>
+        </div>
+    </div>
 
     <header class="hero-section">
         <div class="hero-container">
@@ -59,7 +75,7 @@
     </header>
 
     <section class="work-section" id="work">
-  <div class="section-header">
+  <div class="section-header reveal-on-scroll">
     <h2>Selected Motion Visuals</h2>
     <div class="accent-line"></div>
   </div>
@@ -106,7 +122,7 @@
 
     <section id="support" class="support-section">
         <div class="support-container">
-            <div class="support-info">
+            <div class="support-info reveal-on-scroll">
                 <h2>LET'S SECURE YOUR NEXT PROJECT</h2>
                 <p>Have a complex problem, need technical assistance, or checking status? Log an encrypted agency support ticket instantly.</p>
                 <div class="direct-channels">
@@ -114,7 +130,7 @@
                 </div>
             </div>
 
-            <div class="ticket-box">
+            <div class="ticket-box reveal-on-scroll">
                 <form id="supportTicketForm" class="ticket-form">
                     <div class="form-group">
                         <label for="clientName">Your Name</label>
@@ -145,50 +161,66 @@
     <footer class="studio-footer">
         <p>&copy; 2026 ROBIUL ISLAM. All rights secured.</p>
     </footer>
+    
     <script src="js/support.js"></script>
     <script src="js/main.js"></script>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <script>
+    // 1. Initialize global animation engine engine first so it's ready for items
+    const observerOptions = {
+        root: null,
+        rootMargin: "0px 0px -80px 0px",
+        threshold: 0.1
+    };
+
+    const scrollObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-animated');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    // Track static reveal elements initially on load
+    document.querySelectorAll('.reveal-on-scroll').forEach(el => scrollObserver.observe(el));
+
+    // 2. Initialize Firebase Architecture
     const firebaseConfig = {
-      apiKey: "AIzaSyAR7BTzvAftYn4QYLXxL5N8wKm5Fz7zw9I", // Keep your real API key string here
+      apiKey: "AIzaSyAR7BTzvAftYn4QYLXxL5N8wKm5Fz7zw9I", 
       authDomain: "its-robiul-project.firebaseapp.com",
       projectId: "its-robiul-project",
       storageBucket: "its-robiul-project.firebasestorage.app",
       messagingSenderId: "67384048870",
-      appId: "1:673848048870:web:8e6acaf6d156a4e0cecf27", // Keep your real App ID string here
-      measurementId: "G-Y5H33T4T0H" // Keep your real Measurement ID string here
+      appId: "1:673848048870:web:8e6acaf6d156a4e0cecf27", 
+      measurementId: "G-Y5H33T4T0H" 
     };
 
-    // Start the Firebase stream engine
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore(); // This opens up the database connection
+    const db = firebase.firestore(); 
 
-    // Target the newly added HTML container
     const projectsContainer = document.getElementById('dynamic-projects-container');
 
-    // 1. Pull the live collection documents from Cloud Firestore
+    // Fetch dynamic project matrix from collection
     db.collection("projects")
     .orderBy("createdAt", "desc")
     .limit(3)
     .get()
     .then((querySnapshot) => {
       
-      // Clear out the "Loading..." placeholder text
       projectsContainer.innerHTML = "";
-      
       let cardMarkup = "";
 
-      // 2. Loop through every project document found in your database
       querySnapshot.forEach((doc) => {
         const project = doc.data();
-        const docId = doc.id; // Grabs your document ID string (e.g., 'porsche-cinematic')
+        const docId = doc.id; 
 
-        // 3. Assemble the HTML string using your exact alternating flex box design layout rules
+        // Assembly markup using the animation class rules directly in your loop card string
         cardMarkup += `
-          <div class="project-card">
+          <div class="project-card reveal-on-scroll">
             <div class="project-thumb">
               <img src="${project.thumbnail}" alt="${project.title}">
             </div>
@@ -203,15 +235,17 @@
         `;
       });
 
-      // 4. Inject the compiled database elements directly into your UI canvas
       projectsContainer.innerHTML = cardMarkup;
+
+      // CRITICAL FIX: Tell the engine to immediately lock onto the new dynamic elements
+      document.querySelectorAll('#dynamic-projects-container .reveal-on-scroll').forEach(el => {
+          scrollObserver.observe(el);
+      });
 
     }).catch((error) => {
       console.error("Error fetching portfolio projects from database:", error);
       projectsContainer.innerHTML = `<p style="color: red; text-align: center;">Failed to sync with cloud files.</p>`;
     });
-    
-    console.log("Firebase Database successfully connected!", db);
   </script>
 
 <script>
@@ -226,16 +260,13 @@
   let systemPendingAction = false;
   let storedActionArguments = null;
 
-  // Set your exact deployed Cloudflare Worker URL link address here
   const workerEndpointUrl = "https://robiul-ai-agent.robiulislam66178.workers.dev";
 
-  // SLIDE SIDEBAR TOGGLE HANDLERS
   toggleBtn.addEventListener('click', () => { sidebar.style.right = '0px'; });
   closeBtn.addEventListener('click', () => { sidebar.style.right = '-450px'; });
   closeBtn.addEventListener('mouseover', () => { closeBtn.style.color = '#00ffff'; });
   closeBtn.addEventListener('mouseout', () => { closeBtn.style.color = 'rgba(255,255,255,0.4)'; });
 
-  // COMMAND STREAM PROCESSING INTERFACE
   terminalForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const rawInputText = userInputField.value.trim();
@@ -292,6 +323,33 @@
       outputDisplay.scrollTop = outputDisplay.scrollHeight;
     }
   });
+</script>
+
+<script>
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const mobileNavigationOverlay = document.getElementById('mobile-navigation-overlay');
+    const mobileDrawerLinks = document.querySelectorAll('.mobile-drawer-link');
+
+    // Click trigger opens and closes drawer panels
+    mobileMenuToggle.addEventListener('click', () => {
+        mobileNavigationOverlay.classList.toggle('is-visible');
+        mobileMenuToggle.classList.toggle('is-opened');
+        
+        if(mobileNavigationOverlay.classList.contains('is-visible')) {
+            document.body.style.overflow = 'hidden'; // Stop background scrolling
+        } else {
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // Auto-close overlay tray menu if a link is targeted
+    mobileDrawerLinks.forEach(linkTarget => {
+        linkTarget.addEventListener('click', () => {
+            mobileNavigationOverlay.classList.remove('is-visible');
+            mobileMenuToggle.classList.remove('is-opened');
+            document.body.style.overflow = 'auto';
+        });
+    });
 </script>
 
 </body>

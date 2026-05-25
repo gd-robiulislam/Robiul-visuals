@@ -210,24 +210,34 @@
       }
     });
 
-    // SIGN UP PIPELINE WITH EMAIL VERIFICATION FORWARDING
-    document.getElementById('btn-register').addEventListener('click', async () => {
-      const email = document.getElementById('auth-email').value.trim();
-      const pass = document.getElementById('auth-password').value;
-      if(!email || !pass) return alert("Fill in email and password parameters.");
-      try { 
-        const credential = await auth.createUserWithEmailAndPassword(email, pass);
-        await credential.user.sendEmailVerification();
-        alert("Registration recorded! A verification email link has been routed to your inbox. Please click it to validate authenticity parameters.");
-      } catch(err) { alert(err.message); }
-    });
+    // SIGN UP PIPELINE WITH AUTOMATED MAILING WEBHOOK INTEGRATION
+document.getElementById('btn-register').addEventListener('click', async () => {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-password').value;
+  if(!email || !pass) return alert("Fill in email and password parameters.");
+  try { 
+    const credential = await auth.createUserWithEmailAndPassword(email, pass);
+    await credential.user.sendEmailVerification();
 
-    document.getElementById('btn-login').addEventListener('click', async () => {
-      const email = document.getElementById('auth-email').value.trim();
-      const pass = document.getElementById('auth-password').value;
-      if(!email || !pass) return alert("Fill in email and password parameters.");
-      try { await auth.signInWithEmailAndPassword(email, pass); } catch(err) { alert(err.message); }
-    });
+    // 🔥 AUTOMATION ENGINE: Pass the brand new user's email straight to Make on autopilot!
+    try {
+      await fetch("https://hook.eu1.make.com/46m7a6e9hvx12wp3lugx4wmpjtv", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email,
+          status: "registered",
+          timestamp: new Date().toISOString()
+        })
+      });
+      console.log("User email securely piped to Make automation stream.");
+    } catch (automationErr) {
+      console.error("Automation webhook signal bypassed: ", automationErr);
+    }
+
+    alert("Registration recorded! A verification email link has been routed to your inbox. Please click it to validate authenticity parameters.");
+  } catch(err) { alert(err.message); }
+});
 
     document.getElementById('btn-logout').addEventListener('click', () => auth.signOut());
 
